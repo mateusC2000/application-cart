@@ -9,7 +9,7 @@ class CartSerializer < ActiveModel::Serializer
         name: item.product.name,
         quantity: item.quantity,
         unit_price: item.product.price.to_f,
-        total_price: (item.product.price * item.quantity).round(2)
+        total_price: (item.product.price * item.quantity).round(2).to_f
       }
     end
   end
@@ -18,6 +18,6 @@ class CartSerializer < ActiveModel::Serializer
     total = products.sum { |p| p[:total_price] }
     object.update!(total_price: total)
 
-    total.round(2)
+    total.round(2).to_f
   end
 end

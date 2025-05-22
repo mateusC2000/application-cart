@@ -1,6 +1,34 @@
 require 'rails_helper'
 
 RSpec.describe 'Carts', type: :request do
+  describe 'GET /cart' do
+    let(:product1) { create(:product, name: 'Produto 1', price: 1.99) }
+    let(:product2) { create(:product, name: 'Produto 2', price: 1.99) }
+
+    before do
+      post '/cart/add_item', params: { product_id: product1.id, quantity: 2 }
+      post '/cart/add_item', params: { product_id: product2.id, quantity: 2 }
+    end
+
+    it 'returns the current cart with all products' do
+      get '/cart'
+
+      expect(response).to have_http_status(:ok)
+      body = response.parsed_body
+
+      expect(body).to include("id", "products", "total_price")
+      expect(body["products"].size).to eq(2)
+
+      product = body["products"].find { |p| p["id"] == product1.id }
+      expect(product["name"]).to eq("Produto 1")
+      expect(product["quantity"]).to eq(2)
+      expect(product["unit_price"]).to eq(1.99)
+      expect(product["total_price"]).to eq(3.98)
+
+      expect(body["total_price"]).to eq(7.96)
+    end
+  end
+
   describe 'POST /cart/add_item' do
     let(:product) { create(:product) }
     let(:quantity) { 2 }

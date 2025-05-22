@@ -1,4 +1,9 @@
 class CartsController < ApplicationController
+  def show
+    cart = current_cart
+
+    render json: cart, serializer: CartSerializer, status: :ok
+  end
   def add_item
     cart = current_cart
 
