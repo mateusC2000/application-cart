@@ -8,5 +8,6 @@ Rails.application.routes.draw do
   root "rails/health#show"
   resource :cart do
     post :add_item, on: :collection
+    delete ':product_id', to: 'carts#remove_item', on: :collection
   end
 end

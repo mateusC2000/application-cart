@@ -6,6 +6,10 @@ RSpec.describe CartsController, type: :routing do
       expect(get: '/cart').to route_to(controller: 'carts', action: 'show')
     end
 
+    it 'routes to #remove_item via DELETE' do
+      expect(delete: '/cart/1').to route_to(controller: 'carts', action: 'remove_item', product_id: '1')
+    end
+
     it 'routes to #add_item via POST' do
       expect(post: '/cart/add_item').to route_to(controller: 'carts', action: 'add_item')
     end

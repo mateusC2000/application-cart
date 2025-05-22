@@ -78,4 +78,72 @@ RSpec.describe 'Carts', type: :request do
       end
     end
   end
+
+  describe 'DELETE /cart/:product_id' do
+    let(:product) { create(:product, price: 100.0) }
+    let(:other_product) { create(:product, price: 10.0) }
+
+    context 'when decreasing quantity of a product in the cart' do
+      before do
+        post '/cart/add_item', params: { product_id: product.id, quantity: 2 }
+      end
+
+      it 'decrements the product quantity by 1' do
+        delete "/cart/#{product.id}"
+
+        expect(response).to have_http_status(:ok)
+        body = response.parsed_body
+
+        expect(body["products"].size).to eq(1)
+        expect(body["products"].first["id"]).to eq(product.id)
+        expect(body["products"].first["quantity"]).to eq(1)
+        expect(body["products"].first["total_price"]).to eq(100.0)
+        expect(body["total_price"]).to eq(100.0)
+      end
+    end
+
+    context 'when the product is in the cart with quantity 1' do
+      before do
+        post '/cart/add_item', params: { product_id: product.id, quantity: 1 }
+        post '/cart/add_item', params: { product_id: other_product.id, quantity: 1 }
+      end
+
+      it 'removes the product and returns updated cart' do
+        delete "/cart/#{product.id}"
+
+        expect(response).to have_http_status(:ok)
+
+        body = response.parsed_body
+        expect(body["products"].size).to eq(1)
+        expect(body["products"].first["id"]).to eq(other_product.id)
+        expect(body["total_price"]).to eq(10.0)
+      end
+    end
+
+    context 'when the product is not in the cart' do
+      it 'returns a not found error' do
+        delete "/cart/-1"
+
+        expect(response).to have_http_status(:not_found)
+        expect(response.parsed_body).to include("error")
+      end
+    end
+
+    context 'when removing the last product in the cart' do
+      before do
+        post '/cart/add_item', params: { product_id: product.id, quantity: 1 }
+        delete "/cart/#{product.id}"
+      end
+
+      it 'returns cart with empty products array and zero total_price' do
+        get "/cart"
+
+        expect(response).to have_http_status(:ok)
+        body = response.parsed_body
+
+        expect(body["products"]).to be_empty
+        expect(body["total_price"]).to eq(0.0)
+      end
+    end
+  end
 end

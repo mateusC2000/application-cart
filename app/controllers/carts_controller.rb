@@ -20,6 +20,20 @@ class CartsController < ApplicationController
     render json: { error: e.message }, status: :unprocessable_entity
   end
 
+  def remove_item
+    cart = current_cart
+
+    cart = RemoveProductFromCartService.new(
+      cart: cart,
+      product_id: params[:product_id]
+    ).call
+
+    render json: cart, serializer: CartSerializer, status: :ok
+
+  rescue RemoveProductFromCartService::ProductNotInCartError => e
+    render json: { error: e.message }, status: :not_found
+  end
+
   private
 
   def current_cart
