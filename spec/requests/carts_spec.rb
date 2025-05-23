@@ -94,11 +94,8 @@ RSpec.describe 'Carts', type: :request do
         expect(response).to have_http_status(:ok)
         body = response.parsed_body
 
-        expect(body["products"].size).to eq(1)
-        expect(body["products"].first["id"]).to eq(product.id)
-        expect(body["products"].first["quantity"]).to eq(1)
-        expect(body["products"].first["total_price"]).to eq(100.0)
-        expect(body["total_price"]).to eq(100.0)
+        expect(body["products"].size).to eq(0)
+        expect(body["total_price"]).to eq(0.0)
       end
     end
 

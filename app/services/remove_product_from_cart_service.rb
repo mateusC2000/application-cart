@@ -11,13 +11,9 @@ class RemoveProductFromCartService
 
     raise ProductNotInCartError, "Produto não está no carrinho." unless cart_item
 
-    if cart_item.quantity > 1
-      cart_item.update!(quantity: cart_item.quantity - 1)
-    else
-      cart_item.destroy!
-    end
-
+    cart_item.destroy!
     update_cart_total!
+
     @cart
   end
 
