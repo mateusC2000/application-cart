@@ -45,6 +45,9 @@ class CartsController < ApplicationController
         session[:cart_id] = cart.id
       else
         cart.touch(:last_interaction_at)
+        if cart.abandoned
+          cart.update!(abandoned: false, abandoned_at: nil)
+        end
       end
 
       cart
